@@ -16,6 +16,7 @@ class PostIndex extends Component
     use WithFileUploads;
     public $isModalOpen = false;
     public $filterCategory;
+    public $search;
 
     public $postID;
 
@@ -34,7 +35,13 @@ class PostIndex extends Component
     public function render()
     {
         $listCategory = Category::where('is_active', true)->get();
-        $data = Post::get();
+        $data = Post::when($this->filterCategory, function ($query) {
+            $query->where('category_id', $this->filterCategory);
+        })
+        ->when($this->search, function($query){
+            $query->where('title','like','%'.$this->search.'%');
+        })
+            ->get();
         return view('livewire.post-index', [
             'data' => $data,
             'listCategory' => $listCategory,
@@ -57,7 +64,7 @@ class PostIndex extends Component
     public function store()
     {
         $this->validate();
-        $this->image->storeAs('public/posts', $this->image->hashName(),'public');
+        $this->image->storeAs('public/posts', $this->image->hashName(), 'public');
         if ($this->postID) {
             Post::where('id', $this->postID)
                 ->update([
@@ -78,7 +85,7 @@ class PostIndex extends Component
             ]);
             $msg = 'insert';
         }
-        Toaster::success('Data Berhasil di'.$msg);
+        Toaster::success('Data Berhasil di' . $msg);
         $this->closeModal();
     }
 
@@ -97,7 +104,7 @@ class PostIndex extends Component
     {
 
         $post = Post::find($id);
-        Storage::delete('public/posts/'. $post->image);
+        Storage::delete('public/posts/' . $post->image);
         Post::destroy($id);
         Toaster::error('Data berhasil didelete');
     }

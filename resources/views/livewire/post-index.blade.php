@@ -13,7 +13,14 @@
                 </button>
             </div>
             <div class="col">
-
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label for="">Search</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" wire:model.live="search" class="form-control">
+                    </div>
+                </div>
             </div>
             <div class="col">
                 <div class="row g-2 align-items-center">
